@@ -1,6 +1,9 @@
 package upload
 
+import "PieFileMigrate/src/base"
+
 func NewFTPUploadHandler() Handler {
+	base.InitFtpConfig()
 	return &FTPUploadHandler{}
 }
 

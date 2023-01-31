@@ -1,8 +1,6 @@
 server:
   # 需要进行迁移的源文件目录
   source-path: ./data/fsdata/recordings
-  # 文件上传的目标地址
-  target-addr: http://xxx/xx/xx
   # 增量迁移文件时间限制（单位：秒，只迁移{migrate-file-time-limit}秒内的文件）
   migrate-file-time-limit: 172800
   # 定时迁移任务的cron表达式

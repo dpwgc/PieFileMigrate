@@ -13,6 +13,7 @@ import (
 )
 
 func NewHTTPUploadHandler() Handler {
+	base.InitHttpConfig()
 	return &HTTPUploadHandler{}
 }
 
@@ -24,6 +25,12 @@ func (u *HTTPUploadHandler) UploadFile(fileName string, localFilePath string) er
 
 	// 上传文件
 	_, err := bodyWriter.CreateFormFile(fileName, localFilePath)
+	if err != nil {
+		return err
+	}
+
+	// 校验令牌
+	err = bodyWriter.WriteField("token", base.HttpConfig.Http.Token)
 	if err != nil {
 		return err
 	}
@@ -61,7 +68,7 @@ func (u *HTTPUploadHandler) UploadFile(fileName string, localFilePath string) er
 	// fmt.Printf("迁移本地文件 [ %s ]\n", localFilePath)
 	base.LogHandler.Printf("%s 迁移本地文件 [ %s ]\n", constant.LogInfoTag, localFilePath)
 
-	req, err := http.NewRequest("POST", base.ApplicationConfig.Server.TargetAddr, requestReader)
+	req, err := http.NewRequest("POST", base.HttpConfig.Http.Url, requestReader)
 	if err != nil {
 		return err
 	}

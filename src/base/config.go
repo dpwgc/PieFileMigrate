@@ -7,6 +7,8 @@ import (
 )
 
 var ApplicationConfig applicationConfigModel
+var HttpConfig httpConfigModel
+var FtpConfig ftpConfigModel
 var BoltDBConfig boltDBConfigModel
 var RedisConfig redisConfigModel
 
@@ -16,11 +18,27 @@ type applicationConfigModel struct {
 		SourcePath           string `yaml:"source-path"`
 		MigrateFileTimeLimit int64  `yaml:"migrate-file-time-limit"`
 		JobCron              string `yaml:"job-cron"`
-		TargetAddr           string `yaml:"target-addr"`
 		MQMaxSize            int64  `yaml:"mq-max-size"`
 		MigrateMode          string `yaml:"migrate-mode"`
 		StorageMedia         string `yaml:"storage-media"`
 	} `yaml:"server"`
+}
+
+// HTTP配置模版
+type httpConfigModel struct {
+	Http struct {
+		Url   string `yaml:"url"`
+		Token string `yaml:"token"`
+	} `yaml:"http"`
+}
+
+// FTP配置模版
+type ftpConfigModel struct {
+	Ftp struct {
+		Addr     string `yaml:"addr"`
+		Username string `yaml:"username"`
+		Password string `yaml:"password"`
+	} `yaml:"ftp"`
 }
 
 // BoltDB数据库配置模版
@@ -51,6 +69,28 @@ func initApplicationConfig() {
 		panic(err)
 	}
 	LogHandler.Println(constant.LogInfoTag, "应用配置信息加载成功", string(applicationConfigBytes))
+}
+
+// InitHttpConfig 加载HTTP配置
+func InitHttpConfig() {
+	httpConfigBytes := loadConfigFile("./config/http.yaml")
+	err := yaml.Unmarshal(httpConfigBytes, &HttpConfig)
+	if err != nil {
+		LogHandler.Println(constant.LogErrorTag, err)
+		panic(err)
+	}
+	LogHandler.Println(constant.LogInfoTag, "HTTP配置信息加载成功", string(httpConfigBytes))
+}
+
+// InitFtpConfig 加载FTP配置
+func InitFtpConfig() {
+	ftpConfigBytes := loadConfigFile("./config/ftp.yaml")
+	err := yaml.Unmarshal(ftpConfigBytes, &FtpConfig)
+	if err != nil {
+		LogHandler.Println(constant.LogErrorTag, err)
+		panic(err)
+	}
+	LogHandler.Println(constant.LogInfoTag, "本地数据库(BoltDB)配置信息加载成功", string(ftpConfigBytes))
 }
 
 // InitBoltDBConfig 加载boltdb配置
