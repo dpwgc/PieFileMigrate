@@ -79,7 +79,7 @@ func InitHttpConfig() {
 		LogHandler.Println(constant.LogErrorTag, err)
 		panic(err)
 	}
-	LogHandler.Println(constant.LogInfoTag, "HTTP配置信息加载成功", string(httpConfigBytes))
+	LogHandler.Println(constant.LogInfoTag, "HTTP文件上传配置信息加载成功", string(httpConfigBytes))
 }
 
 // InitFtpConfig 加载FTP配置
@@ -90,7 +90,7 @@ func InitFtpConfig() {
 		LogHandler.Println(constant.LogErrorTag, err)
 		panic(err)
 	}
-	LogHandler.Println(constant.LogInfoTag, "本地数据库(BoltDB)配置信息加载成功", string(ftpConfigBytes))
+	LogHandler.Println(constant.LogInfoTag, "FTP文件上传配置信息加载成功", string(ftpConfigBytes))
 }
 
 // InitBoltDBConfig 加载boltdb配置
