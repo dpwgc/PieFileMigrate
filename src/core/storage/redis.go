@@ -10,6 +10,7 @@ import (
 )
 
 func NewRedisStorageHandler() Handler {
+	base.InitRedisConfig()
 	client, err := initRedis()
 	if err != nil {
 		base.LogHandler.Println(constant.LogErrorTag, err)

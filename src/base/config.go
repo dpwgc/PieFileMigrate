@@ -42,25 +42,6 @@ type redisConfigModel struct {
 	} `yaml:"redis"`
 }
 
-// 本地配置加载
-func initConfig() {
-
-	// 加载应用配置
-	initApplicationConfig()
-
-	//存储介质选择
-	switch ApplicationConfig.Server.StorageMedia {
-	case "boltdb":
-		// 加载boltdb配置
-		initBoltDBConfig()
-		break
-	case "redis":
-		// 加载redis配置
-		initRedisConfig()
-		break
-	}
-}
-
 // 加载应用配置
 func initApplicationConfig() {
 	applicationConfigBytes := loadConfigFile("./config/application.yaml")
@@ -72,8 +53,8 @@ func initApplicationConfig() {
 	LogHandler.Println(constant.LogInfoTag, "应用配置信息加载成功", string(applicationConfigBytes))
 }
 
-// 加载boltdb配置
-func initBoltDBConfig() {
+// InitBoltDBConfig 加载boltdb配置
+func InitBoltDBConfig() {
 	boltdbConfigBytes := loadConfigFile("./config/boltdb.yaml")
 	err := yaml.Unmarshal(boltdbConfigBytes, &BoltDBConfig)
 	if err != nil {
@@ -83,8 +64,8 @@ func initBoltDBConfig() {
 	LogHandler.Println(constant.LogInfoTag, "本地数据库(BoltDB)配置信息加载成功", string(boltdbConfigBytes))
 }
 
-// 加载redis配置
-func initRedisConfig() {
+// InitRedisConfig 加载redis配置
+func InitRedisConfig() {
 	redisConfigBytes := loadConfigFile("./config/redis.yaml")
 	err := yaml.Unmarshal(redisConfigBytes, &RedisConfig)
 	if err != nil {

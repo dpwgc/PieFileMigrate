@@ -7,7 +7,7 @@ import (
 
 func InitBase() {
 	initLog()
-	initConfig()
+	initApplicationConfig()
 	LogHandler.Println(constant.LogInfoTag, "基础服务加载成功")
 	fmt.Printf(constant.ConsolePrintCyan, " * 基础服务加载成功 ")
 }

@@ -10,6 +10,7 @@ import (
 const tableName = "upload_file_mark"
 
 func NewBoltDBStorageHandler() Handler {
+	base.InitBoltDBConfig()
 	db, err := initBoltDBStorage()
 	if err != nil {
 		base.LogHandler.Println(constant.LogErrorTag, err)
