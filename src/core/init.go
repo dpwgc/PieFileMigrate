@@ -32,9 +32,6 @@ func InitCore() {
 	case "ftp":
 		uploadHandler = upload.NewFTPUploadHandler()
 		break
-	case "sftp":
-		uploadHandler = upload.NewSFTPUploadHandler()
-		break
 	}
 
 	//加载MQ
