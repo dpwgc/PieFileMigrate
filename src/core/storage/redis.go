@@ -9,6 +9,8 @@ import (
 	"time"
 )
 
+const keyPrefix = "upload-file-mark-"
+
 func NewRedisStorageHandler() Handler {
 	base.InitRedisConfig()
 	client, err := initRedis()
@@ -44,7 +46,7 @@ func initRedis() (*redis.Client, error) {
 
 func (s *RedisStorageHandler) MarkFile(filePath string) bool {
 	var ctx = context.Background()
-	res := s.Client.Set(ctx, filePath, util.GetLocalDateTime(), -1)
+	res := s.Client.Set(ctx, keyPrefix+filePath, util.GetLocalDateTime(), -1)
 	//写入数据库失败
 	if res.Err() != nil {
 		base.LogHandler.Println(constant.LogErrorTag, res.Err())
@@ -55,7 +57,7 @@ func (s *RedisStorageHandler) MarkFile(filePath string) bool {
 
 func (s *RedisStorageHandler) CheckFile(filePath string) bool {
 	var ctx = context.Background()
-	res := s.Client.Get(ctx, filePath)
+	res := s.Client.Get(ctx, keyPrefix+filePath)
 	//查询数据库失败
 	if res.Err() != nil {
 		base.LogHandler.Println(constant.LogErrorTag, res.Err())
