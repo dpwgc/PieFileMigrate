@@ -6,7 +6,7 @@ import (
 )
 
 // 内置消息队列
-var mq = make(chan messageModel, base.Config.Server.MQMaxSize)
+var mq = make(chan messageModel, base.ApplicationConfig.Server.MQMaxSize)
 
 // 消息模版
 type messageModel struct {

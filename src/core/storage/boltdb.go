@@ -7,6 +7,8 @@ import (
 	"github.com/boltdb/bolt"
 )
 
+const tableName = "upload_file_mark"
+
 func NewBoltDBStorageHandler() Handler {
 	db, err := initBoltDBStorage()
 	if err != nil {
@@ -25,7 +27,7 @@ type BoltDBStorageHandler struct {
 
 func initBoltDBStorage() (*bolt.DB, error) {
 	// 创建或者打开数据库
-	db, err := bolt.Open("local_data.db", 0600, nil)
+	db, err := bolt.Open(base.BoltDBConfig.Boltdb.Db, 0600, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +35,7 @@ func initBoltDBStorage() (*bolt.DB, error) {
 	// 创建表
 	err = db.Update(func(tx *bolt.Tx) error {
 		// 创建upload_file_mark表
-		_, err = tx.CreateBucketIfNotExists([]byte("upload_file_mark"))
+		_, err = tx.CreateBucketIfNotExists([]byte(tableName))
 		if err != nil {
 			return err
 		}
@@ -48,7 +50,7 @@ func initBoltDBStorage() (*bolt.DB, error) {
 
 func (s *BoltDBStorageHandler) MarkFile(filePath string) bool {
 	err := s.DB.Update(func(tx *bolt.Tx) error {
-		uploadFileMarkBucket := tx.Bucket([]byte("upload_file_mark"))
+		uploadFileMarkBucket := tx.Bucket([]byte(tableName))
 		if uploadFileMarkBucket != nil {
 			return uploadFileMarkBucket.Put([]byte(filePath), []byte(util.GetLocalDateTime()))
 		}
@@ -65,7 +67,7 @@ func (s *BoltDBStorageHandler) MarkFile(filePath string) bool {
 func (s *BoltDBStorageHandler) CheckFile(filePath string) bool {
 	value := []byte("")
 	err := s.DB.View(func(tx *bolt.Tx) error {
-		uploadFileMarkBucket := tx.Bucket([]byte("upload_file_mark"))
+		uploadFileMarkBucket := tx.Bucket([]byte(tableName))
 		if uploadFileMarkBucket != nil {
 			value = uploadFileMarkBucket.Get([]byte(filePath))
 		}

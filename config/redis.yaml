@@ -1,0 +1,7 @@
+redis:
+  addr: 0.0.0.0:6379
+  password:
+  db:
+  pool-size:
+  min-idle-conn:
+  max-conn-age:

@@ -1,0 +1,2 @@
+boltdb:
+  db: local_data.db
