@@ -9,7 +9,7 @@ import (
 // 初始化定时任务
 func initJob() {
 	job := newWithSeconds()
-	_, err := job.AddFunc(base.ApplicationConfig.Server.JobCron, func() {
+	_, err := job.AddFunc(base.ApplicationConfig.Application.JobCron, func() {
 		doMigrate()
 	})
 	if err != nil {

@@ -1,6 +1,6 @@
-server:
+application:
   # 需要进行迁移的源文件目录
-  source-path: ./data/fsdata/recordings
+  source-path: ./data
   # 增量迁移文件时间限制（单位：秒，只迁移{migrate-file-time-limit}秒内的文件）
   migrate-file-time-limit: 172800
   # 定时迁移任务的cron表达式
@@ -9,5 +9,5 @@ server:
   mq-max-size: 1000
   # 文件迁移方式（http、ftp）
   migrate-mode: http
-  # 存储介质（boltdb、redis）
+  # 文件上传记录存储介质（boltdb、redis）
   storage-media: boltdb

@@ -15,7 +15,7 @@ var uploadHandler upload.Handler
 func InitCore() {
 
 	//存储介质选择
-	switch base.ApplicationConfig.Server.StorageMedia {
+	switch base.ApplicationConfig.Application.StorageMedia {
 	case "boltdb":
 		storageHandler = storage.NewBoltDBStorageHandler()
 		break
@@ -25,7 +25,7 @@ func InitCore() {
 	}
 
 	//迁移方式选择
-	switch base.ApplicationConfig.Server.MigrateMode {
+	switch base.ApplicationConfig.Application.MigrateMode {
 	case "http":
 		uploadHandler = upload.NewHTTPUploadHandler()
 		break

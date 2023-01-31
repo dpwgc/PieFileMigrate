@@ -14,14 +14,14 @@ var RedisConfig redisConfigModel
 
 // 应用配置模版
 type applicationConfigModel struct {
-	Server struct {
+	Application struct {
 		SourcePath           string `yaml:"source-path"`
 		MigrateFileTimeLimit int64  `yaml:"migrate-file-time-limit"`
 		JobCron              string `yaml:"job-cron"`
 		MQMaxSize            int64  `yaml:"mq-max-size"`
 		MigrateMode          string `yaml:"migrate-mode"`
 		StorageMedia         string `yaml:"storage-media"`
-	} `yaml:"server"`
+	} `yaml:"application"`
 }
 
 // HTTP配置模版
