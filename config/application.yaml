@@ -7,7 +7,7 @@ server:
   job-cron: 0/10 * * * * ?
   # 内置mq容量大小
   mq-max-size: 1000
-  # 文件迁移方式（http、ftp、sftp）
+  # 文件迁移方式（http、ftp）
   migrate-mode: http
   # 存储介质（boltdb、redis）
   storage-media: boltdb
