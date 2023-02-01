@@ -35,7 +35,7 @@ type httpConfigModel struct {
 // FTP配置模版
 type ftpConfigModel struct {
 	Ftp struct {
-		Addr       string `yaml:"addr"`
+		TargetAddr string `yaml:"target-addr"`
 		TargetPath string `yaml:"target-path"`
 		Username   string `yaml:"username"`
 		Password   string `yaml:"password"`

@@ -1,6 +1,7 @@
 ftp:
   # 文件上传的目标地址
-  addr: 0.0.0.0:21
+  target-addr: 0.0.0.0:21
+  # 文件存储的目标路径
   target-path: /data
   username:
   password:
