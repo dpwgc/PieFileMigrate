@@ -14,7 +14,7 @@ type messageModel struct {
 	// 文件命名
 	FileName string
 	// 文件路径
-	LocalFilePath string
+	FilePath string
 	// 文件更新时间
 	ModTime time.Time
 }
@@ -26,11 +26,11 @@ func initMQ() {
 }
 
 // 异步迁移文件
-func asyncMigrateFile(fileName string, localFilePath string, modTime time.Time) {
+func asyncMigrateFile(fileName string, filePath string, modTime time.Time) {
 	msg := messageModel{
-		FileName:      fileName,
-		LocalFilePath: localFilePath,
-		ModTime:       modTime,
+		FileName: fileName,
+		FilePath: filePath,
+		ModTime:  modTime,
 	}
 	mq <- msg
 }
@@ -53,13 +53,13 @@ func consume() {
 		}
 	}()
 	msg := <-mq
-	err := uploadHandler.UploadFile(msg.FileName, msg.LocalFilePath)
+	err := uploadHandler.UploadFile(msg.FileName, msg.FilePath, msg.ModTime)
 	if err != nil {
 		base.LogHandler.Println(constant.LogErrorTag, "文件上传失败", err)
 		return
 	}
 	// 如果上传成功，将文件标记为已上传
-	ok := storageHandler.MarkFile(msg.LocalFilePath, msg.ModTime)
+	ok := storageHandler.MarkFile(msg.FilePath, msg.ModTime)
 	if !ok {
 		base.LogHandler.Println(constant.LogErrorTag, "文件标记失败")
 		return

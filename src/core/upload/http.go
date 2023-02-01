@@ -2,7 +2,6 @@ package upload
 
 import (
 	"PieFileMigrate/src/base"
-	"PieFileMigrate/src/constant"
 	"bytes"
 	"errors"
 	"fmt"
@@ -10,6 +9,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+	"time"
 )
 
 func NewHTTPUploadHandler() Handler {
@@ -19,12 +19,21 @@ func NewHTTPUploadHandler() Handler {
 
 type HTTPUploadHandler struct{}
 
-func (u *HTTPUploadHandler) UploadFile(fileName string, filePath string) error {
+func (u *HTTPUploadHandler) UploadFile(fileName string, filePath string, modTime time.Time) error {
 	bodyBuf := bytes.NewBufferString("")
 	bodyWriter := multipart.NewWriter(bodyBuf)
 
 	// 上传文件
-	_, err := bodyWriter.CreateFormFile(fileName, filePath)
+	fw, err := bodyWriter.CreateFormFile("file", fileName)
+	if err != nil {
+		return err
+	}
+	fh, err := os.Open(filePath)
+	if err != nil {
+		return err
+	}
+	defer fh.Close()
+	_, err = io.Copy(fw, fh)
 	if err != nil {
 		return err
 	}
@@ -47,7 +56,8 @@ func (u *HTTPUploadHandler) UploadFile(fileName string, filePath string) error {
 		return err
 	}
 
-	fh, err := os.Open(filePath)
+	// 文件最后修改时间
+	err = bodyWriter.WriteField("modTime", fmt.Sprintf("%v", modTime.UnixMilli()))
 	if err != nil {
 		return err
 	}
@@ -56,13 +66,6 @@ func (u *HTTPUploadHandler) UploadFile(fileName string, filePath string) error {
 	closeBuf := bytes.NewBufferString(fmt.Sprintf("\r\n--%s--\r\n", boundary))
 
 	requestReader := io.MultiReader(bodyBuf, fh, closeBuf)
-	fi, err := fh.Stat()
-	if err != nil {
-		return err
-	}
-
-	// fmt.Printf("迁移本地文件 [ %s ]\n", localFilePath)
-	base.LogHandler.Printf("%s 迁移本地文件 [ %s ]\n", constant.LogInfoTag, filePath)
 
 	req, err := http.NewRequest("POST", base.HttpConfig.Http.TargetUrl, requestReader)
 	if err != nil {
@@ -70,7 +73,6 @@ func (u *HTTPUploadHandler) UploadFile(fileName string, filePath string) error {
 	}
 
 	req.Header.Add("Content-Type", "multipart/form-data; boundary="+boundary)
-	req.ContentLength = fi.Size() + int64(bodyBuf.Len()) + int64(closeBuf.Len())
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {

@@ -18,8 +18,7 @@ func doMigrate() {
 		}
 	}()
 
-	// fmt.Printf("开始迁移目录: [ %s ]\n", path)
-	base.LogHandler.Printf("%s 开始迁移目录: [ %s ]\n", constant.LogInfoTag, base.ApplicationConfig.Application.SourcePath)
+	base.LogHandler.Printf("%s 扫描目录: [ %s ]\n", constant.LogInfoTag, base.ApplicationConfig.Application.SourcePath)
 
 	var children []fileTreeNodeModel
 	root := fileTreeNodeModel{
@@ -48,6 +47,7 @@ func dfsFileTree(node *fileTreeNodeModel) {
 		if storageHandler.CheckFile(node.Path, node.ModTime) && node.ModTime.Unix() > (time.Now().Unix()-base.ApplicationConfig.Application.MigrateFileTimeLimit) {
 			// 异步迁移文件至其他服务器
 			asyncMigrateFile(node.Name, node.Path, node.ModTime)
+			base.LogHandler.Printf("%s 迁移文件 [ %s ]\n", constant.LogInfoTag, node.Path)
 		}
 		return
 	}
