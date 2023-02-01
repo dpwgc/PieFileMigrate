@@ -1,3 +1,5 @@
 boltdb:
+  # 数据库存储文件名
   db: local_data.db
+  # 文件记录表名
   table-name: upload_file_mark

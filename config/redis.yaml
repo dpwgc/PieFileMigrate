@@ -1,7 +1,9 @@
 redis:
+  # Redis地址
   addr: 0.0.0.0:6379
   password:
   db:
+  # key前缀
   key-prefix: M-
   pool-size:
   min-idle-conn:

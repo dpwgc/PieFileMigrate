@@ -9,6 +9,6 @@ func NewFTPUploadHandler() Handler {
 
 type FTPUploadHandler struct{}
 
-func (u *FTPUploadHandler) UploadFile(fileName string, localFilePath string) error {
+func (u *FTPUploadHandler) UploadFile(fileName string, filePath string) error {
 	return nil
 }

@@ -19,12 +19,12 @@ func NewHTTPUploadHandler() Handler {
 
 type HTTPUploadHandler struct{}
 
-func (u *HTTPUploadHandler) UploadFile(fileName string, localFilePath string) error {
+func (u *HTTPUploadHandler) UploadFile(fileName string, filePath string) error {
 	bodyBuf := bytes.NewBufferString("")
 	bodyWriter := multipart.NewWriter(bodyBuf)
 
 	// 上传文件
-	_, err := bodyWriter.CreateFormFile(fileName, localFilePath)
+	_, err := bodyWriter.CreateFormFile(fileName, filePath)
 	if err != nil {
 		return err
 	}
@@ -42,23 +42,19 @@ func (u *HTTPUploadHandler) UploadFile(fileName string, localFilePath string) er
 	}
 
 	// 上传路径
-	err = bodyWriter.WriteField("filePath", localFilePath)
+	err = bodyWriter.WriteField("filePath", filePath)
 	if err != nil {
 		return err
 	}
 
-	// the file data will be the second part of the body
-	fh, err := os.Open(localFilePath)
+	fh, err := os.Open(filePath)
 	if err != nil {
 		return err
 	}
-	// need to know the boundary to properly close the part myself.
+
 	boundary := bodyWriter.Boundary()
-	//close_string := fmt.Sprintf("\r\n--%s--\r\n", boundary)
 	closeBuf := bytes.NewBufferString(fmt.Sprintf("\r\n--%s--\r\n", boundary))
 
-	// use multi-reader to defer the reading of the file data until
-	// writing to the socket buffer.
 	requestReader := io.MultiReader(bodyBuf, fh, closeBuf)
 	fi, err := fh.Stat()
 	if err != nil {
@@ -66,14 +62,13 @@ func (u *HTTPUploadHandler) UploadFile(fileName string, localFilePath string) er
 	}
 
 	// fmt.Printf("迁移本地文件 [ %s ]\n", localFilePath)
-	base.LogHandler.Printf("%s 迁移本地文件 [ %s ]\n", constant.LogInfoTag, localFilePath)
+	base.LogHandler.Printf("%s 迁移本地文件 [ %s ]\n", constant.LogInfoTag, filePath)
 
 	req, err := http.NewRequest("POST", base.HttpConfig.Http.TargetUrl, requestReader)
 	if err != nil {
 		return err
 	}
 
-	// Set headers for multipart, and Content Length
 	req.Header.Add("Content-Type", "multipart/form-data; boundary="+boundary)
 	req.ContentLength = fi.Size() + int64(bodyBuf.Len()) + int64(closeBuf.Len())
 
