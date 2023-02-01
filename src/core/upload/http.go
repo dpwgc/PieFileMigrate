@@ -68,7 +68,7 @@ func (u *HTTPUploadHandler) UploadFile(fileName string, localFilePath string) er
 	// fmt.Printf("迁移本地文件 [ %s ]\n", localFilePath)
 	base.LogHandler.Printf("%s 迁移本地文件 [ %s ]\n", constant.LogInfoTag, localFilePath)
 
-	req, err := http.NewRequest("POST", base.HttpConfig.Http.Url, requestReader)
+	req, err := http.NewRequest("POST", base.HttpConfig.Http.TargetUrl, requestReader)
 	if err != nil {
 		return err
 	}

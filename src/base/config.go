@@ -27,24 +27,26 @@ type applicationConfigModel struct {
 // HTTP配置模版
 type httpConfigModel struct {
 	Http struct {
-		Url   string `yaml:"url"`
-		Token string `yaml:"token"`
+		TargetUrl string `yaml:"target-url"`
+		Token     string `yaml:"token"`
 	} `yaml:"http"`
 }
 
 // FTP配置模版
 type ftpConfigModel struct {
 	Ftp struct {
-		Addr     string `yaml:"addr"`
-		Username string `yaml:"username"`
-		Password string `yaml:"password"`
+		Addr       string `yaml:"addr"`
+		TargetPath string `yaml:"target-path"`
+		Username   string `yaml:"username"`
+		Password   string `yaml:"password"`
 	} `yaml:"ftp"`
 }
 
 // BoltDB数据库配置模版
 type boltDBConfigModel struct {
 	Boltdb struct {
-		Db string `yaml:"db"`
+		Db        string `yaml:"db"`
+		TableName string `yaml:"table-name"`
 	} `yaml:"boltdb"`
 }
 
@@ -54,6 +56,7 @@ type redisConfigModel struct {
 		Addr        string `yaml:"addr"`
 		Password    string `yaml:"password"`
 		Db          int    `yaml:"db"`
+		KeyPrefix   string `yaml:"key-prefix"`
 		PoolSize    int    `yaml:"pool-size"`
 		MinIdleConn int    `yaml:"min-idle-conn"`
 		MaxConnAge  int    `yaml:"max-conn-age"`

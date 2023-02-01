@@ -44,10 +44,10 @@ type fileTreeNodeModel struct {
 func dfsFileTree(node *fileTreeNodeModel) {
 	// 如果是文件
 	if !node.IsDir {
-		// 如果该文件没有上传过且更新时间在限制时间内
-		if !storageHandler.CheckFile(node.Path) && node.ModTime.Unix() > (time.Now().Unix()-base.ApplicationConfig.Application.MigrateFileTimeLimit) {
+		// 如果该文件没有标记或标记过期 && 更新时间在限制时间内
+		if storageHandler.CheckFile(node.Path, node.ModTime) && node.ModTime.Unix() > (time.Now().Unix()-base.ApplicationConfig.Application.MigrateFileTimeLimit) {
 			// 异步迁移文件至其他服务器
-			asyncMigrateFile(node.Name, node.Path)
+			asyncMigrateFile(node.Name, node.Path, node.ModTime)
 		}
 		return
 	}

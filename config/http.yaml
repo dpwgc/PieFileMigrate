@@ -1,4 +1,4 @@
 http:
   # 文件上传的目标地址
-  url: http://127.0.0.1:8080/xx/xx
+  target-url: http://127.0.0.1:8080/xx/xx
   token:

@@ -3,6 +3,7 @@ package core
 import (
 	"PieFileMigrate/src/base"
 	"PieFileMigrate/src/constant"
+	"time"
 )
 
 // 内置消息队列
@@ -14,6 +15,8 @@ type messageModel struct {
 	FileName string
 	// 文件路径
 	LocalFilePath string
+	// 文件更新时间
+	ModTime time.Time
 }
 
 // 初始化MQ
@@ -23,10 +26,11 @@ func initMQ() {
 }
 
 // 异步迁移文件
-func asyncMigrateFile(fileName string, localFilePath string) {
+func asyncMigrateFile(fileName string, localFilePath string, modTime time.Time) {
 	msg := messageModel{
 		FileName:      fileName,
 		LocalFilePath: localFilePath,
+		ModTime:       modTime,
 	}
 	mq <- msg
 }
@@ -35,13 +39,13 @@ func asyncMigrateFile(fileName string, localFilePath string) {
 func initMQConsumer() {
 	go func() {
 		for {
-			consumeMessage()
+			consume()
 		}
 	}()
 }
 
 // 消费消息
-func consumeMessage() {
+func consume() {
 	defer func() {
 		err := recover()
 		if err != nil {
@@ -55,7 +59,7 @@ func consumeMessage() {
 		return
 	}
 	// 如果上传成功，将文件标记为已上传
-	ok := storageHandler.MarkFile(msg.LocalFilePath)
+	ok := storageHandler.MarkFile(msg.LocalFilePath, msg.ModTime)
 	if !ok {
 		base.LogHandler.Println(constant.LogErrorTag, "文件标记失败")
 		return

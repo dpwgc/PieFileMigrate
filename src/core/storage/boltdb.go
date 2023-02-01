@@ -3,11 +3,10 @@ package storage
 import (
 	"PieFileMigrate/src/base"
 	"PieFileMigrate/src/constant"
-	"PieFileMigrate/src/util"
+	"encoding/binary"
 	"github.com/boltdb/bolt"
+	"time"
 )
-
-const tableName = "upload_file_mark"
 
 func NewBoltDBStorageHandler() Handler {
 	base.InitBoltDBConfig()
@@ -36,7 +35,7 @@ func initBoltDBStorage() (*bolt.DB, error) {
 	// 创建表
 	err = db.Update(func(tx *bolt.Tx) error {
 		// 创建upload_file_mark表
-		_, err = tx.CreateBucketIfNotExists([]byte(tableName))
+		_, err = tx.CreateBucketIfNotExists([]byte(base.BoltDBConfig.Boltdb.TableName))
 		if err != nil {
 			return err
 		}
@@ -49,11 +48,13 @@ func initBoltDBStorage() (*bolt.DB, error) {
 	return db, nil
 }
 
-func (s *BoltDBStorageHandler) MarkFile(filePath string) bool {
+func (s *BoltDBStorageHandler) MarkFile(filePath string, modTime time.Time) bool {
 	err := s.DB.Update(func(tx *bolt.Tx) error {
-		uploadFileMarkBucket := tx.Bucket([]byte(tableName))
+		uploadFileMarkBucket := tx.Bucket([]byte(base.BoltDBConfig.Boltdb.TableName))
 		if uploadFileMarkBucket != nil {
-			return uploadFileMarkBucket.Put([]byte(filePath), []byte(util.GetLocalDateTime()))
+			value := make([]byte, 8)
+			binary.LittleEndian.PutUint64(value, uint64(modTime.UnixMilli()))
+			return uploadFileMarkBucket.Put([]byte(filePath), value)
 		}
 		return nil
 	})
@@ -65,10 +66,10 @@ func (s *BoltDBStorageHandler) MarkFile(filePath string) bool {
 	return true
 }
 
-func (s *BoltDBStorageHandler) CheckFile(filePath string) bool {
+func (s *BoltDBStorageHandler) CheckFile(filePath string, modTime time.Time) bool {
 	value := []byte("")
 	err := s.DB.View(func(tx *bolt.Tx) error {
-		uploadFileMarkBucket := tx.Bucket([]byte(tableName))
+		uploadFileMarkBucket := tx.Bucket([]byte(base.BoltDBConfig.Boltdb.TableName))
 		if uploadFileMarkBucket != nil {
 			value = uploadFileMarkBucket.Get([]byte(filePath))
 		}
@@ -79,5 +80,14 @@ func (s *BoltDBStorageHandler) CheckFile(filePath string) bool {
 		base.LogHandler.Println(constant.LogErrorTag, err)
 		return false
 	}
-	return value != nil
+	// 如果key不存在，说明该文件未被标记，需要上传
+	if value == nil {
+		return true
+	}
+	i := int64(binary.LittleEndian.Uint64(value))
+	// 如果本地文件更新时间大于记录中的文件更新时间，说明该文件需要同步
+	if modTime.UnixMilli() > i {
+		return true
+	}
+	return false
 }

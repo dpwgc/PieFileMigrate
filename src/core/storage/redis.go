@@ -3,13 +3,10 @@ package storage
 import (
 	"PieFileMigrate/src/base"
 	"PieFileMigrate/src/constant"
-	"PieFileMigrate/src/util"
 	"context"
 	"github.com/go-redis/redis/v8"
 	"time"
 )
-
-const keyPrefix = "upload-file-mark-"
 
 func NewRedisStorageHandler() Handler {
 	base.InitRedisConfig()
@@ -44,9 +41,9 @@ func initRedis() (*redis.Client, error) {
 	return client, nil
 }
 
-func (s *RedisStorageHandler) MarkFile(filePath string) bool {
+func (s *RedisStorageHandler) MarkFile(filePath string, modTime time.Time) bool {
 	var ctx = context.Background()
-	res := s.Client.Set(ctx, keyPrefix+filePath, util.GetLocalDateTime(), -1)
+	res := s.Client.Set(ctx, base.RedisConfig.Redis.KeyPrefix+filePath, modTime.UnixMilli(), -1)
 	//写入数据库失败
 	if res.Err() != nil {
 		base.LogHandler.Println(constant.LogErrorTag, res.Err())
@@ -55,13 +52,27 @@ func (s *RedisStorageHandler) MarkFile(filePath string) bool {
 	return true
 }
 
-func (s *RedisStorageHandler) CheckFile(filePath string) bool {
+func (s *RedisStorageHandler) CheckFile(filePath string, modTime time.Time) bool {
+	key := base.RedisConfig.Redis.KeyPrefix + filePath
 	var ctx = context.Background()
-	res := s.Client.Get(ctx, keyPrefix+filePath)
+	// 如果key不存在，说明该文件未被标记，需要上传
+	if s.Client.Exists(ctx, key).Val() == 0 {
+		return true
+	}
+	res := s.Client.Get(ctx, key)
 	//查询数据库失败
 	if res.Err() != nil {
 		base.LogHandler.Println(constant.LogErrorTag, res.Err())
 		return false
 	}
-	return len(res.String()) > 0
+	i, err := res.Int64()
+	if err != nil {
+		base.LogHandler.Println(constant.LogErrorTag, err)
+		return false
+	}
+	// 如果本地文件更新时间大于记录中的文件更新时间，说明该文件需要同步
+	if modTime.UnixMilli() > i {
+		return true
+	}
+	return false
 }
