@@ -18,5 +18,5 @@ func initLog() {
 			panic(err)
 		}
 	}
-	LogHandler = log.New(logFile, "", log.LstdFlags|log.LUTC) // 将文件设置为loger作为输出
+	LogHandler = log.New(logFile, "", log.LstdFlags|log.Lshortfile)
 }
