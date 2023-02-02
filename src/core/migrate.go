@@ -44,11 +44,14 @@ type fileTreeNodeModel struct {
 func scanFileTree(node *fileTreeNodeModel, migrateFileAgeLimit int64) {
 	// 如果是文件
 	if !node.IsDir {
-		// 如果该文件没有标记或标记过期 && 更新时间在限制时间内
-		if storageHandler.CheckFile(node.Path, node.ModTime) && node.ModTime.Unix() > (time.Now().Unix()-migrateFileAgeLimit) {
-			// 异步迁移文件至其他服务器
-			asyncMigrateFile(node.Name, node.Path, node.ModTime)
-			base.LogHandler.Printf("%s 迁移文件 [ %s ]\n", constant.LogInfoTag, node.Path)
+		// 如果该文件没有标记或标记过期
+		if storageHandler.CheckFile(node.Path, node.ModTime) {
+			// 如果更新时间在限制时间内 或 限制时间 <= 0
+			if migrateFileAgeLimit <= 0 || node.ModTime.Unix() > (time.Now().Unix()-migrateFileAgeLimit) {
+				// 异步迁移文件至其他服务器
+				asyncMigrateFile(node.Name, node.Path, node.ModTime)
+				base.LogHandler.Printf("%s 迁移文件 [ %s ]\n", constant.LogInfoTag, node.Path)
+			}
 		}
 		return
 	}
