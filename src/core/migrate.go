@@ -9,7 +9,7 @@ import (
 )
 
 // doMigrate 执行迁移操作
-func doMigrate() {
+func doMigrate(sourcePath string, migrateFileAgeLimit int64) {
 
 	defer func() {
 		err := recover()
@@ -18,15 +18,15 @@ func doMigrate() {
 		}
 	}()
 
-	base.LogHandler.Printf("%s 扫描目录: [ %s ]\n", constant.LogInfoTag, base.ApplicationConfig.Application.SourcePath)
+	base.LogHandler.Printf("%s 扫描目录: [ %s ]\n", constant.LogInfoTag, sourcePath)
 
 	var children []fileTreeNodeModel
 	root := fileTreeNodeModel{
 		IsDir:    true,
-		Path:     base.ApplicationConfig.Application.SourcePath,
+		Path:     sourcePath,
 		Children: children,
 	}
-	dfsFileTree(&root)
+	scanFileTree(&root, migrateFileAgeLimit)
 }
 
 // 文件树节点
@@ -39,12 +39,12 @@ type fileTreeNodeModel struct {
 	Children []fileTreeNodeModel `json:"children"`
 }
 
-// 递归遍历文件树
-func dfsFileTree(node *fileTreeNodeModel) {
+// 递归扫描文件树
+func scanFileTree(node *fileTreeNodeModel, migrateFileAgeLimit int64) {
 	// 如果是文件
 	if !node.IsDir {
 		// 如果该文件没有标记或标记过期 && 更新时间在限制时间内
-		if storageHandler.CheckFile(node.Path, node.ModTime) && node.ModTime.Unix() > (time.Now().Unix()-base.ApplicationConfig.Application.MigrateFileTimeLimit) {
+		if storageHandler.CheckFile(node.Path, node.ModTime) && node.ModTime.Unix() > (time.Now().Unix()-migrateFileAgeLimit) {
 			// 异步迁移文件至其他服务器
 			asyncMigrateFile(node.Name, node.Path, node.ModTime)
 			base.LogHandler.Printf("%s 迁移文件 [ %s ]\n", constant.LogInfoTag, node.Path)
@@ -68,7 +68,7 @@ func dfsFileTree(node *fileTreeNodeModel) {
 				ModTime:  v.ModTime,
 				Children: children,
 			}
-			dfsFileTree(&child)
+			scanFileTree(&child, migrateFileAgeLimit)
 			node.Children = append(node.Children, child)
 		}
 	}

@@ -34,11 +34,11 @@ func InitCore() {
 		break
 	}
 
-	//加载MQ
-	initMQ()
+	//加载消息队列
+	initMq()
 
 	//启动定时任务
-	initJob()
+	initWorker()
 
 	base.LogHandler.Println(constant.LogInfoTag, "核心服务加载成功")
 	fmt.Printf(constant.ConsolePrintCyan, " * 核心服务加载成功 ")

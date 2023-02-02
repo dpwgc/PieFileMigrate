@@ -15,13 +15,22 @@ var RedisConfig redisConfigModel
 // 应用配置模版
 type applicationConfigModel struct {
 	Application struct {
-		SourcePath           string `yaml:"source-path"`
-		MigrateFileTimeLimit int64  `yaml:"migrate-file-time-limit"`
-		JobCron              string `yaml:"job-cron"`
-		MQMaxSize            int64  `yaml:"mq-max-size"`
-		MigrateMode          string `yaml:"migrate-mode"`
-		StorageMedia         string `yaml:"storage-media"`
+		Workers      []WorkerConfigModel `yaml:"workers"`
+		Mq           MqConfigModel       `yaml:"mq"`
+		MigrateMode  string              `yaml:"migrate-mode"`
+		StorageMedia string              `yaml:"storage-media"`
 	} `yaml:"application"`
+}
+
+type MqConfigModel struct {
+	MaxSize     int `yaml:"max-size"`
+	ConsumerNum int `yaml:"consumer-num"`
+}
+
+type WorkerConfigModel struct {
+	SourcePath          string `yaml:"source-path"`
+	MigrateFileAgeLimit int64  `yaml:"migrate-file-age-limit"`
+	JobCron             string `yaml:"job-cron"`
 }
 
 // HTTP配置模版

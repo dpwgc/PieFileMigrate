@@ -3,14 +3,23 @@ package core
 import (
 	"PieFileMigrate/src/base"
 	"PieFileMigrate/src/constant"
+	"fmt"
 	"github.com/robfig/cron/v3"
 )
 
-// 初始化定时任务
-func initJob() {
+// 初始化迁移工作者
+func initWorker() {
+	for _, v := range base.ApplicationConfig.Application.Workers {
+		enableJob(v.JobCron, v.SourcePath, v.MigrateFileAgeLimit)
+		base.LogHandler.Println(constant.LogInfoTag, fmt.Sprintf("[ %s ] 目录迁移工作者启动", v.SourcePath))
+	}
+}
+
+// 启动任务
+func enableJob(jobCron string, sourcePath string, migrateFileAgeLimit int64) {
 	job := newWithSeconds()
-	_, err := job.AddFunc(base.ApplicationConfig.Application.JobCron, func() {
-		doMigrate()
+	_, err := job.AddFunc(jobCron, func() {
+		doMigrate(sourcePath, migrateFileAgeLimit)
 	})
 	if err != nil {
 		base.LogHandler.Println(constant.LogErrorTag, err)

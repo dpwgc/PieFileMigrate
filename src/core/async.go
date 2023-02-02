@@ -3,11 +3,12 @@ package core
 import (
 	"PieFileMigrate/src/base"
 	"PieFileMigrate/src/constant"
+	"fmt"
 	"time"
 )
 
 // 内置消息队列
-var mq = make(chan messageModel, base.ApplicationConfig.Application.MQMaxSize)
+var mq = make(chan messageModel, base.ApplicationConfig.Application.Mq.MaxSize)
 
 // 消息模版
 type messageModel struct {
@@ -19,9 +20,9 @@ type messageModel struct {
 	ModTime time.Time
 }
 
-// 初始化MQ
-func initMQ() {
-	initMQConsumer()
+// 初始化内置消息队列
+func initMq() {
+	initMqConsumer()
 	base.LogHandler.Println(constant.LogInfoTag, "内置消息队列启动成功")
 }
 
@@ -36,16 +37,23 @@ func asyncMigrateFile(fileName string, filePath string, modTime time.Time) {
 }
 
 // 初始化MQ消费者
-func initMQConsumer() {
-	go func() {
-		for {
-			consume()
-		}
-	}()
+func initMqConsumer() {
+	for i := 0; i < base.ApplicationConfig.Application.Mq.ConsumerNum; i++ {
+		go enableConsumer()
+		base.LogHandler.Println(constant.LogInfoTag, "内置消息队列", fmt.Sprintf("%v号消费者启动", i))
+	}
+}
+
+// 启动消费者
+func enableConsumer() {
+	// 循环消费消息
+	for {
+		consumeMessage()
+	}
 }
 
 // 消费消息
-func consume() {
+func consumeMessage() {
 	defer func() {
 		err := recover()
 		if err != nil {
