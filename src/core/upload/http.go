@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -82,5 +83,17 @@ func (u *HTTPUploadHandler) UploadFile(fileName string, filePath string, modTime
 		return errors.New("status code != 200")
 	}
 
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err == nil {
+		return err
+	}
+
+	if string(body) != "ok" {
+		return errors.New("response body != ok")
+	}
+
+	// 只有当http状态码为200且返回数据为小写字符串'ok'时才会判定为上传成功
 	return nil
 }

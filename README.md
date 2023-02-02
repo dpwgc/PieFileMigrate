@@ -1,17 +1,21 @@
 # PieFileMigrate 
-## 文件迁移脚本
+## 一个基于Go开发的小型文件批量迁移脚本
 
 ***
 
 ### 简介
 
-PieFileMigrate是一个简易的小型文件批量迁移脚本，可将服务器内的一个或多个目录内的全部文件通过HTTP或FTP（未实现）的方式定时增量/全量同步上传至其他服务器。
+PieFileMigrate是一个基于Go开发的小型文件批量迁移脚本，可将服务器内的一个或多个目录内的全部文件通过HTTP或FTP（未实现）的方式定时增量/全量同步上传至其他服务器。
 
 ***
 
-### 原理
+### 说明
 
-`TODO`
+* `文件迁移流程`：定时扫描本地目录下的所有文件，将未被标记的文件上传至指定服务器中，如果上传成功，则标记该文件。
+* `如何标记文件`：如果一个文件上传成功，则将它的完整路径及它的最近修改时间写入KV数据库中（可以选择用本地BoltDB存储或者用线上Redis存储），每次上传文件前都会检查该文件路径是否已经在KV数据库中，如果已存在就说明该文件已经被上传过了，无需重复上传。
+* `增量迁移方式`：自行修改 config/application.yaml 配置文件中的 migrate-file-age-limit 配置项，迁移目录下最近一段时间内更新的文件。
+* `全量迁移方式`：将 config/application.yaml 配置文件中的 migrate-file-age-limit 设成0，迁移目录下的所有文件。
+* `重新全量迁移`：如果想重新全量迁移整个目录，可以先停用脚本，将标记用的KV数据库表删除/清空，重新运行脚本即可。
 
 ***
 
@@ -59,8 +63,18 @@ http:
 
 #### 自定义文件接收接口示例
 
-* 需要接收5个参数，分别是：`fileName` 文件名 `filePath` 文件原路径 `modTime` 文件最近修改时间 `token` 权限校验令牌（自定义校验逻辑） `file` 文件
-* 需要自行编写接收逻辑（例如把文件传入对象存储或者云盘里）
+* 该接口的`Content-Type`必须为`multipart/form-data`，需要接收5个参数
+
+| 参数名      | 参数类型   | 参数说明     |
+|----------|--------|----------|
+| fileName | string | 文件名      |
+| filePath | string | 文件原路径    |
+| modTime  | string | 文件最近修改时间 |
+| token    | string | 权限校验令牌   |
+| fileName | string | 文件名      |
+| file     | file   | 文件       |
+
+* 需要自行编写接收逻辑，以下是示例接口代码
 
 ```
 package main
@@ -81,7 +95,7 @@ func main() {
 
 func uploadTargetApi(c *gin.Context) {
 
-	// 文件原命名
+	// 文件名
 	fileName := c.PostForm("fileName")
 	fmt.Println("fileName: ", fileName)
 
@@ -105,14 +119,14 @@ func uploadTargetApi(c *gin.Context) {
 		return
 	}
 	
-	//保存文件到本地
+	//保存文件到本地（这部分逻辑自定义，例如可以将文件上传至对象存储）
 	if err := c.SaveUploadedFile(file, "./data/"+fileName); err != nil {
 		c.String(http.StatusBadRequest, "fail")
 		fmt.Println("SaveUploadedFile: ", err)
 		return
 	}
 	
-	// 注意，必须要确保文件保存成功后才返回 code 200
+	// 注意，文件保存成功后，必须返回指定格式数据（http状态码必须为200，返回数据必须为小写字符串'ok'），只有这样脚本才会将该文件判定为上传成功
 	c.String(http.StatusOK, "ok")
 }
 ```
