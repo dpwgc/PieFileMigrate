@@ -5,6 +5,7 @@ import (
 	"PieFileMigrate/src/constant"
 	"fmt"
 	"github.com/robfig/cron/v3"
+	"time"
 )
 
 // 初始化迁移工作者
@@ -19,7 +20,17 @@ func initWorker() {
 func enableJob(jobCron string, sourcePath string, migrateFileAgeLimit int64) {
 	job := newWithSeconds()
 	_, err := job.AddFunc(jobCron, func() {
+
+		// 工作者运行监控，记录最近一次迁移开始时间
+		workerMonitor := base.WorkerMonitorModel{
+			LastMigrateStartTime: time.Now(),
+		}
+
 		doMigrate(sourcePath, migrateFileAgeLimit)
+
+		// 工作者运行监控，记录最近一次迁移结束时间
+		workerMonitor.LastMigrateEndTime = time.Now()
+		base.WorkerMonitorMap.Store(sourcePath, workerMonitor)
 	})
 	if err != nil {
 		base.LogHandler.Println(constant.LogErrorTag, err)

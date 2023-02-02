@@ -4,8 +4,8 @@ import (
 	"PieFileMigrate/src/base"
 	"PieFileMigrate/src/constant"
 	"PieFileMigrate/src/core"
+	"PieFileMigrate/src/ui"
 	"fmt"
-	"time"
 )
 
 func main() {
@@ -13,7 +13,5 @@ func main() {
 	base.InitBase()
 	core.InitCore()
 	fmt.Printf(constant.ConsolePrintGreen, " * 程序启动成功 ")
-	for {
-		time.Sleep(100 * time.Second)
-	}
+	ui.InitHttpRouter()
 }

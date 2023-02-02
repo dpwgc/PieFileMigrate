@@ -17,6 +17,7 @@ type applicationConfigModel struct {
 	Application struct {
 		Workers      []WorkerConfigModel `yaml:"workers"`
 		Mq           MqConfigModel       `yaml:"mq"`
+		ServerPort   int                 `yaml:"server-port"`
 		MigrateMode  string              `yaml:"migrate-mode"`
 		StorageMedia string              `yaml:"storage-media"`
 	} `yaml:"application"`

@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/boltdb/bolt v1.3.1
 	github.com/go-redis/redis/v8 v8.11.5
+	github.com/julienschmidt/httprouter v1.3.0
 	github.com/robfig/cron/v3 v3.0.1
 	gopkg.in/yaml.v3 v3.0.1
 )

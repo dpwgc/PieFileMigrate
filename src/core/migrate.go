@@ -26,6 +26,7 @@ func doMigrate(sourcePath string, migrateFileAgeLimit int64) {
 		Path:     sourcePath,
 		Children: children,
 	}
+
 	scanFileTree(&root, migrateFileAgeLimit)
 }
 
