@@ -1,5 +1,5 @@
 http:
   # 文件上传的目标地址
-  target-url: http://127.0.0.1:8011/demo/uploadTargetApi
+  target-url: http://127.0.0.1:8011/demo/uploadTargetBatchApi
   # token令牌
   token: xxx

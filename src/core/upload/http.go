@@ -149,6 +149,7 @@ func (u *HTTPUploadHandler) UploadFiles(fileNames []string, filePaths []string, 
 			fh.Close()
 			return err
 		}
+		fh.Close()
 	}
 
 	requestReader := io.MultiReader(bodyBuf)
