@@ -103,8 +103,6 @@ func (u *HTTPUploadHandler) UploadFiles(fileNames []string, filePaths []string, 
 	bodyBuf := bytes.NewBufferString("")
 	bodyWriter := multipart.NewWriter(bodyBuf)
 
-	boundary := bodyWriter.Boundary()
-
 	// 校验令牌
 	err := bodyWriter.WriteField("token", base.HttpConfig.Http.Token)
 	if err != nil {
@@ -152,7 +150,10 @@ func (u *HTTPUploadHandler) UploadFiles(fileNames []string, filePaths []string, 
 		fh.Close()
 	}
 
-	requestReader := io.MultiReader(bodyBuf)
+	boundary := bodyWriter.Boundary()
+	closeBuf := bytes.NewBufferString(fmt.Sprintf("\r\n--%s--\r\n", boundary))
+
+	requestReader := io.MultiReader(bodyBuf, closeBuf)
 
 	req, err := http.NewRequest("POST", base.HttpConfig.Http.TargetUrl, requestReader)
 	if err != nil {
