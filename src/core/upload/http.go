@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -85,7 +84,7 @@ func (u *HTTPUploadHandler) UploadFile(fileName string, filePath string, modTime
 
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err == nil {
 		return err
 	}
@@ -172,7 +171,7 @@ func (u *HTTPUploadHandler) UploadFiles(fileNames []string, filePaths []string, 
 
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err == nil {
 		return err
 	}

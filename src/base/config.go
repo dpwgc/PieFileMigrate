@@ -25,8 +25,9 @@ type applicationConfigModel struct {
 }
 
 type MqConfigModel struct {
-	MaxSize     int `yaml:"max-size"`
-	ConsumerNum int `yaml:"consumer-num"`
+	MaxSize      int `yaml:"max-size"`
+	ConsumeBatch int `yaml:"consume-batch"`
+	ConsumerNum  int `yaml:"consumer-num"`
 }
 
 type WorkerConfigModel struct {
