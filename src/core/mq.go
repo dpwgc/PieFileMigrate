@@ -60,16 +60,26 @@ func consumeMessage() {
 			base.LogHandler.Println(constant.LogErrorTag, err)
 		}
 	}()
-	msg := <-mq
-	err := uploadHandler.UploadFile(msg.FileName, msg.FilePath, msg.ModTime)
+	var fileNames []string
+	var filePaths []string
+	var modTimes []time.Time
+	for i := 0; i < 100; i++ {
+		msg := <-mq
+		fileNames = append(fileNames, msg.FileName)
+		filePaths = append(filePaths, msg.FilePath)
+		modTimes = append(modTimes, msg.ModTime)
+	}
+	err := uploadHandler.UploadFiles(fileNames, filePaths, modTimes)
 	if err != nil {
 		base.LogHandler.Println(constant.LogErrorTag, "文件上传失败", err)
 		return
 	}
 	// 如果上传成功，将文件标记为已上传
-	ok := storageHandler.MarkFile(msg.FilePath, msg.ModTime)
-	if !ok {
-		base.LogHandler.Println(constant.LogErrorTag, "文件标记失败")
-		return
+	for i := 0; i < 100; i++ {
+		ok := storageHandler.MarkFile(filePaths[i], modTimes[i])
+		if !ok {
+			base.LogHandler.Println(constant.LogErrorTag, "文件标记失败")
+			return
+		}
 	}
 }
