@@ -21,4 +21,9 @@ application:
     # 内置mq容量大小
     max-size: 1000
     # 内置mq消费者数量（文件迁移并发数）
-    consumer-num: 5
+    consumer-num: 100
+
+  # 日志配置
+  log:
+    # 日志文件最长存活时间（单位：天）
+    maxAge: 7

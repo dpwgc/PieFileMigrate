@@ -20,6 +20,7 @@ type applicationConfigModel struct {
 		ServerPort   int                 `yaml:"server-port"`
 		MigrateMode  string              `yaml:"migrate-mode"`
 		StorageMedia string              `yaml:"storage-media"`
+		Log          Log                 `yaml:"log"`
 	} `yaml:"application"`
 }
 
@@ -32,6 +33,10 @@ type WorkerConfigModel struct {
 	SourcePath          string `yaml:"source-path"`
 	MigrateFileAgeLimit int64  `yaml:"migrate-file-age-limit"`
 	JobCron             string `yaml:"job-cron"`
+}
+
+type Log struct {
+	MaxAge int `yaml:"maxAge"`
 }
 
 // HTTP配置模版
