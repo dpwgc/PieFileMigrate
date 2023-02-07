@@ -27,6 +27,7 @@ type S3UploadHandler struct {
 }
 
 func (u *S3UploadHandler) UploadFiles(fileNames []string, filePaths []string, modTimes []time.Time) error {
+
 	for i := 0; i < len(fileNames); i++ {
 
 		file, err := util.ReadFile(filePaths[i])
@@ -39,14 +40,14 @@ func (u *S3UploadHandler) UploadFiles(fileNames []string, filePaths []string, mo
 			Key:    aws.String(filePaths[i]),
 			Body:   bytes.NewReader(file),
 		})
+
 		if err != nil {
 			if aerr, ok := err.(awserr.Error); ok && aerr.Code() == request.CanceledErrorCode {
-				// If the SDK can determine the request or retry delay was canceled
-				// by a context the CanceledErrorCode error code will be returned.
 				return fmt.Errorf("upload canceled due to timeout, %v", err)
 			}
 			return fmt.Errorf("failed to upload object, %v", err)
 		}
+
 	}
 	return nil
 }
@@ -54,9 +55,9 @@ func (u *S3UploadHandler) UploadFiles(fileNames []string, filePaths []string, mo
 func newS3Client() *s3.S3 {
 	creds := credentials.NewStaticCredentials(base.S3Config.S3.AccessKey, base.S3Config.S3.SecretKey, "")
 	sess := session.Must(session.NewSession(&aws.Config{
-		Region:           aws.String("default"),
+		Region:           aws.String(base.S3Config.S3.Region),
 		Endpoint:         &base.S3Config.S3.Endpoint,
-		S3ForcePathStyle: &base.S3Config.S3.PathStyle, // 因为使用的IP:Port/bucket的形式，使用path风格
+		S3ForcePathStyle: &base.S3Config.S3.PathStyle,
 		Credentials:      creds,
 	}))
 	svc := s3.New(sess)

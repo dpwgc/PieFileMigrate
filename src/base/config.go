@@ -63,6 +63,7 @@ type ftpConfigModel struct {
 type s3ConfigModel struct {
 	S3 struct {
 		Endpoint  string `yaml:"endpoint"`
+		Region    string `yaml:"region"`
 		Bucket    string `yaml:"bucket"`
 		AccessKey string `yaml:"access-key"`
 		SecretKey string `yaml:"secret-key"`

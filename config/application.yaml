@@ -2,7 +2,7 @@ application:
 
   # http服务端口（用于监控脚本运行情况）
   server-port: 8012
-  # 文件迁移方式（http、ftp）
+  # 文件迁移方式（http、ftp、s3）
   migrate-mode: http
   # 文件上传记录存储介质（boltdb、redis）
   storage-media: boltdb

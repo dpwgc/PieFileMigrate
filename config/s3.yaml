@@ -1,6 +1,7 @@
 s3:
-  endpoint: http://127.0.0.1:9000
-  bucket: images
-  access-Key: minioadmin
-  secret-Key: minioadmin
+  endpoint: https://0.0.0.0:2012
+  region: default
+  bucket:
+  access-key:
+  secret-key:
   path-style: true
