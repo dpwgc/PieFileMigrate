@@ -32,6 +32,8 @@ func InitCore() {
 	case "ftp":
 		uploadHandler = upload.NewFTPUploadHandler()
 		break
+	case "s3":
+		uploadHandler = upload.NewS3UploadHandler()
 	}
 
 	//加载消息队列

@@ -9,6 +9,7 @@ import (
 var ApplicationConfig applicationConfigModel
 var HttpConfig httpConfigModel
 var FtpConfig ftpConfigModel
+var S3Config s3ConfigModel
 var BoltDBConfig boltDBConfigModel
 var RedisConfig redisConfigModel
 
@@ -56,6 +57,17 @@ type ftpConfigModel struct {
 		Username   string `yaml:"username"`
 		Password   string `yaml:"password"`
 	} `yaml:"ftp"`
+}
+
+// S3配置模版
+type s3ConfigModel struct {
+	S3 struct {
+		Endpoint  string `yaml:"endpoint"`
+		Bucket    string `yaml:"bucket"`
+		AccessKey string `yaml:"access-key"`
+		SecretKey string `yaml:"secret-key"`
+		PathStyle bool   `yaml:"path-style"`
+	} `yaml:"s3"`
 }
 
 // BoltDB数据库配置模版
@@ -110,6 +122,17 @@ func InitFtpConfig() {
 		panic(err)
 	}
 	LogHandler.Println(constant.LogInfoTag, "FTP文件上传配置信息加载成功", string(ftpConfigBytes))
+}
+
+// InitS3Config 加载S3配置
+func InitS3Config() {
+	s3ConfigBytes := loadConfigFile("./config/s3.yaml")
+	err := yaml.Unmarshal(s3ConfigBytes, &S3Config)
+	if err != nil {
+		LogHandler.Println(constant.LogErrorTag, err)
+		panic(err)
+	}
+	LogHandler.Println(constant.LogInfoTag, "S3文件上传配置信息加载成功", string(s3ConfigBytes))
 }
 
 // InitBoltDBConfig 加载boltdb配置
