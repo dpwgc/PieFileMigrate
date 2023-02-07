@@ -22,7 +22,7 @@ func enableJob(jobCron string, sourcePath string, migrateFileAgeLimit int64) {
 	_, err := job.AddFunc(jobCron, func() {
 
 		// 队列长度低于一定阈值后才能执行下一次任务
-		if len(mq) < base.ApplicationConfig.Application.Mq.ConsumeBatch*base.ApplicationConfig.Application.Mq.ConsumerNum {
+		if len(mq) < base.ApplicationConfig.Application.Mq.ConsumeBatch+1 {
 
 			// 工作者运行监控，记录最近一次迁移开始时间
 			workerMonitor := base.WorkerMonitorModel{

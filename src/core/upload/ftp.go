@@ -12,10 +12,6 @@ func NewFTPUploadHandler() Handler {
 
 type FTPUploadHandler struct{}
 
-func (u *FTPUploadHandler) UploadFile(fileName string, filePath string, modTime time.Time) error {
-	return nil
-}
-
 func (u *FTPUploadHandler) UploadFiles(fileNames []string, filePaths []string, modTimes []time.Time) error {
 	return nil
 }
