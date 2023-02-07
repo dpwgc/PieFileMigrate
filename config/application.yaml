@@ -21,7 +21,7 @@ application:
     # 内置mq容量大小
     max-size: 10000000
     # 内置mq单批次消费消息数量（必须大于0）
-    consume-batch: 1000
+    consume-batch: 100
     # 内置mq消费者数量（文件迁移并发数）
     consumer-num: 5
 
