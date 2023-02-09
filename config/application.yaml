@@ -12,7 +12,7 @@ application:
       # 需要进行迁移的源文件目录（两个工作者不能同时迁移一个目录）
     - source-path: ./data
       # 增量迁移文件时间限制（单位：秒，只迁移{migrate-file-time-limit}秒内更新的文件，小于等于0则全部迁移）
-      migrate-file-age-limit: 0
+      migrate-file-age-limit: 172800
       # 定时迁移任务的cron表达式
       job-cron: 0/60 * * * * ?
 
